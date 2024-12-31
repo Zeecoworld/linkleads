@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkedIn Profile Search</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2E4057;
+            --secondary-color: #66A182;
+            --accent-color: #4F7CAC;
+            --background-color: #EEF1F6;
+            --text-color: #2C3E50;
+            --download-color: #4338ca;
+        }
+
+        body {
+            background-color: var(--background-color);
+            padding: 40px 0;
+            color: var(--text-color);
+        }
+
+        .navbar {
+            background-color: var(--primary-color) !important;
+            padding: 15px 0;
+        }
+
+        .navbar-brand, .nav-link {
+            color: white !important;
+        }
+
+        .nav-link:hover {
+            color: var(--secondary-color) !important;
+        }
+
+        .container {
+            max-width: 900px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            background-color: white;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 3px rgba(102, 161, 130, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .btn-primary {
+            background-color: var(--secondary-color);
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn-download {
+            background-color: var(--download-color);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-top: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 6px -1px rgba(67, 56, 202, 0.1), 0 2px 4px -1px rgba(67, 56, 202, 0.06);
+        }
+
+        .btn-download:hover {
+            background-color: #3730a3;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(67, 56, 202, 0.1), 0 4px 6px -2px rgba(67, 56, 202, 0.05);
+        }
+
+        .btn-download:active {
+            transform: translateY(0);
+        }
+
+        .btn-download i {
+            font-size: 1.2em;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .info-icon {
+            color: var(--accent-color);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .form-check-label {
+            color: var(--text-color);
+        }
+
+        .form-text {
+            color: #666;
+            margin-top: 4px;
+        }
+
+        #content {
+            min-height: calc(100vh - 200px);
+            padding-top: 80px;
+        }
+
+        .contact-icon {
+            font-size: 2rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .contact-info {
+            transition: all 0.3s ease;
+        }
+
+        .contact-info:hover {
+            transform: translateY(-5px);
+        }
+        .country-search-wrapper {
+            position: relative;
+        }
+
+        .country-search-input {
+            padding-right: 30px;
+        }
+
+        .country-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .country-dropdown.show {
+            display: block;
+        }
+
+        .country-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .country-option:hover {
+            background-color: var(--background-color);
+        }
+
+        .country-option.selected {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .country-search-clear {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            display: none;
+        }
+
+        .country-search-clear.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="" onclick="showPage('search')">LinkedInSearch</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('search')">Search</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showPage('contact')">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Container -->
+    <div id="content">
+        <!-- Search Page -->
+        <div id="search-page" class="container page">
+            <div class="card">
+                <h1 class="h3 mb-4">Easily use Google to search profiles on LinkedIn</h1>
+                
+                <form id="searchForm" id="searchForm" action="{% url 'process_search' %}" method="post">
+                   {% csrf_token %}
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Country
+                                <i class="fas fa-circle-info info-icon" data-bs-toggle="tooltip" title="Select the country where you want to search for profiles"></i>
+                            </label>
+                            <div class="country-search-wrapper">
+                                <input type="text" name="country" class="form-control country-search-input" placeholder="Search country..." autocomplete="off">
+                                <i class="fas fa-times country-search-clear"></i>
+                                <div class="country-dropdown">
+                                    <!-- Countries will be populated by JavaScript -->
+                                </div>
+                                <input type="hidden" id="selectedCountry">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Job title
+                                <i class="fas fa-circle-info info-icon" data-bs-toggle="tooltip" title="Enter the job title you're looking for"></i>
+                            </label>
+                            <input type="text" class="form-control" name="job_title" placeholder="e.g. Data scientist" value="Data scientist">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" name="show_similar" type="checkbox" id="showSimilar">
+                                <label class="form-check-label" for="showSimilar">Show similar jobs?</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Location or keywords to include
+                                <i class="fas fa-circle-info info-icon" data-bs-toggle="tooltip" title="Add keywords or locations that must be present in the profile"></i>
+                            </label>
+                            <input type="text" name="include_keywords" class="form-control" value="machine learning">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Keywords to exclude
+                                <i class="fas fa-circle-info info-icon" data-bs-toggle="tooltip" title="Add keywords that should not appear in the profile"></i>
+                            </label>
+                            <input type="text" name="exclude_keywords" class="form-control" value="junior">
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Education
+                                <i class="fas fa-circle-info info-icon" data-bs-toggle="tooltip" title="Filter by education level"></i>
+                            </label>
+                            <select name="education" class="form-select">
+                                <option>All candidates</option>
+                                <option>Bachelor's degree</option>
+                                <option>Master's degree</option>
+                                <option>PhD</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">
+                                Current Employer
+                                <i class="fas fa-circle-info info-icon" data-bs-toggle="tooltip" title="Filter by current company"></i>
+                            </label>
+                            <input type="text"  name="current_employer" class="form-control" placeholder="E.g. Paypal">
+                        </div>
+
+                        <div class="col-md-7 p-4 container">
+                            <label class="form-label">
+                                Year of Experience
+                                <i class="fas fa-circle-info info-icon" data-bs-toggle="tooltip" title="Filter by experience"></i>
+                            </label>
+                            <input type="number"  name="years_exp" class="form-control" placeholder="Enter number">
+                        </div>
+                    </div>
+
+                    <div class="button-container">
+                        <button type="submit" class="btn btn-primary">Find the right people on LinkedIn</button>
+                        <button type="button" class="btn-download w-100">
+                            <i class="fas fa-download"></i>
+                            Download Leads
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contact Page -->
+        <div id="contact-page" class="container page" style="display: none;">
+            <div class="card">
+                <h1 class="h3 mb-4 text-center">Contact Us</h1>
+                
+                <div class="row mb-5">
+                    <div class="col-md-4 text-center contact-info">
+                        <i class="fas fa-map-marker-alt contact-icon"></i>
+                        <h5>Location</h5>
+                        <p>Worldwide</p>
+                    </div>
+                    <div class="col-md-4 text-center contact-info">
+                        <i class="fas fa-envelope contact-icon"></i>
+                        <h5>Email</h5>
+                        <p>zeecomedia2@gmail.com</p>
+                    </div>
+                    <div class="col-md-4 text-center contact-info">
+                        <i class="fas fa-phone contact-icon"></i>
+                        <h5>Phone</h5>
+                        <p>+2348166305591</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add this HTML right after the closing div of content -->
+    <div class="modal fade" id="searchResultModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Your Search Query</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Copy, save or open the search string in Google and find the right candidates</p>
+                    <div class="input-group mb-3">
+                        <input type="text" id="searchUrl" class="form-control" readonly>
+                        <button class="btn btn-outline-secondary copy-btn" type="button">
+                            <i class="fas fa-copy"></i> Copied
+                        </button>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-primary save-search">
+                            <i class="fas fa-save"></i> Save Search
+                        </button>
+                        <button class="btn btn-success open-google">
+                            <i class="fas fa-external-link-alt"></i> Open in Google
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="downloadModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Download Leads</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-center">Stay tuned! We're working on this feature.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('searchForm');
+        const searchResultModal = new bootstrap.Modal(document.getElementById('searchResultModal'));
+        const downloadModal = new bootstrap.Modal(document.getElementById('downloadModal'));
+        
+        // Handle form submission
+        searchForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('{% url "process_search" %}', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('searchUrl').value = data.search_url;
+                    searchResultModal.show();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+
+        // Handle download leads button
+        document.querySelector('.btn-download').addEventListener('click', function() {
+            downloadModal.show();
+        });
+
+        // Copy URL functionality
+        document.querySelector('.copy-btn').addEventListener('click', function() {
+            const urlInput = document.getElementById('searchUrl');
+            urlInput.select();
+            document.execCommand('copy');
+            this.innerHTML = '<i class="fas fa-check"></i> Copied';
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-copy"></i> Copy';
+            }, 2000);
+        });
+
+        // Open in Google functionality
+        document.querySelector('.open-google').addEventListener('click', function() {
+            const url = document.getElementById('searchUrl').value;
+            window.open(url, '_blank');
+        });
+    });
+    </script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+        });
+
+        // Page navigation
+        function showPage(pageName) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById(pageName + '-page').style.display = 'block';
+        }
+    </script>
+    <script>
+        // Country data
+        const countries = [
+            { code: 'AF', name: 'Afghanistan' },
+            { code: 'AL', name: 'Albania' },
+            { code: 'DZ', name: 'Algeria' },
+            { code: 'AS', name: 'American Samoa' },
+            { code: 'AD', name: 'Andorra' },
+            { code: 'AO', name: 'Angola' },
+            { code: 'AI', name: 'Anguilla' },
+            { code: 'AQ', name: 'Antarctica' },
+            { code: 'AG', name: 'Antigua and Barbuda' },
+            { code: 'AR', name: 'Argentina' },
+            { code: 'AM', name: 'Armenia' },
+            { code: 'AW', name: 'Aruba' },
+            { code: 'AU', name: 'Australia' },
+            { code: 'AT', name: 'Austria' },
+            { code: 'AZ', name: 'Azerbaijan' },
+            { code: 'BS', name: 'Bahamas' },
+            { code: 'BH', name: 'Bahrain' },
+            { code: 'BD', name: 'Bangladesh' },
+            { code: 'BB', name: 'Barbados' },
+            { code: 'BY', name: 'Belarus' },
+            { code: 'BE', name: 'Belgium' },
+            { code: 'BZ', name: 'Belize' },
+            { code: 'BJ', name: 'Benin' },
+            { code: 'BM', name: 'Bermuda' },
+            { code: 'BT', name: 'Bhutan' },
+            { code: 'BO', name: 'Bolivia' },
+            { code: 'BA', name: 'Bosnia and Herzegovina' },
+            { code: 'BW', name: 'Botswana' },
+            { code: 'BR', name: 'Brazil' },
+            { code: 'BN', name: 'Brunei Darussalam' },
+            { code: 'BG', name: 'Bulgaria' },
+            { code: 'BF', name: 'Burkina Faso' },
+            { code: 'BI', name: 'Burundi' },
+            { code: 'KH', name: 'Cambodia' },
+            { code: 'CM', name: 'Cameroon' },
+            { code: 'CA', name: 'Canada' },
+            { code: 'CV', name: 'Cape Verde' },
+            { code: 'KY', name: 'Cayman Islands' },
+            { code: 'CF', name: 'Central African Republic' },
+            { code: 'TD', name: 'Chad' },
+            { code: 'CL', name: 'Chile' },
+            { code: 'CN', name: 'China' },
+            { code: 'CX', name: 'Christmas Island' },
+            { code: 'CC', name: 'Cocos (Keeling) Islands' },
+            { code: 'CO', name: 'Colombia' },
+            { code: 'KM', name: 'Comoros' },
+            { code: 'CG', name: 'Congo' },
+            { code: 'CD', name: 'Congo (Democratic Republic)' },
+            { code: 'CK', name: 'Cook Islands' },
+            { code: 'CR', name: 'Costa Rica' },
+            { code: 'CI', name: 'Cote d\'Ivoire' },
+            { code: 'HR', name: 'Croatia' },
+            { code: 'CU', name: 'Cuba' },
+            { code: 'CY', name: 'Cyprus' },
+            { code: 'CZ', name: 'Czech Republic' },
+            { code: 'DK', name: 'Denmark' },
+            { code: 'DJ', name: 'Djibouti' },
+            { code: 'DM', name: 'Dominica' },
+            { code: 'DO', name: 'Dominican Republic' },
+            { code: 'EC', name: 'Ecuador' },
+            { code: 'EG', name: 'Egypt' },
+            { code: 'SV', name: 'El Salvador' },
+            { code: 'GQ', name: 'Equatorial Guinea' },
+            { code: 'ER', name: 'Eritrea' },
+            { code: 'EE', name: 'Estonia' },
+            { code: 'ET', name: 'Ethiopia' },
+            { code: 'FK', name: 'Falkland Islands (Malvinas)' },
+            { code: 'FO', name: 'Faroe Islands' },
+            { code: 'FJ', name: 'Fiji' },
+            { code: 'FI', name: 'Finland' },
+            { code: 'FR', name: 'France' },
+            { code: 'GF', name: 'French Guiana' },
+            { code: 'PF', name: 'French Polynesia' },
+            { code: 'TF', name: 'French Southern Territories' },
+            { code: 'GA', name: 'Gabon' },
+            { code: 'GM', name: 'Gambia' },
+            { code: 'GE', name: 'Georgia' },
+            { code: 'DE', name: 'Germany' },
+            { code: 'GH', name: 'Ghana' },
+            { code: 'GI', name: 'Gibraltar' },
+            { code: 'GR', name: 'Greece' },
+            { code: 'GL', name: 'Greenland' },
+            { code: 'GD', name: 'Grenada' },
+            { code: 'GP', name: 'Guadeloupe' },
+            { code: 'GU', name: 'Guam' },
+            { code: 'GT', name: 'Guatemala' },
+            { code: 'GG', name: 'Guernsey' },
+            { code: 'GN', name: 'Guinea' },
+            { code: 'GW', name: 'Guinea-Bissau' },
+            { code: 'GY', name: 'Guyana' },
+            { code: 'HT', name: 'Haiti' },
+            { code: 'HM', name: 'Heard Island and McDonald Islands' },
+            { code: 'HN', name: 'Honduras' },
+            { code: 'HK', name: 'Hong Kong' },
+            { code: 'HU', name: 'Hungary' },
+            { code: 'IS', name: 'Iceland' },
+            { code: 'IN', name: 'India' },
+            { code: 'ID', name: 'Indonesia' },
+            { code: 'IR', name: 'Iran' },
+            { code: 'IQ', name: 'Iraq' },
+            { code: 'IE', name: 'Ireland' },
+            { code: 'IL', name: 'Israel' },
+            { code: 'IT', name: 'Italy' },
+            { code: 'JM', name: 'Jamaica' },
+            { code: 'JP', name: 'Japan' },
+            { code: 'JE', name: 'Jersey' },
+            { code: 'JO', name: 'Jordan' },
+            { code: 'KZ', name: 'Kazakhstan' },
+            { code: 'KE', name: 'Kenya' },
+            { code: 'KI', name: 'Kiribati' },
+            { code: 'KR', name: 'South Korea' },
+            { code: 'KW', name: 'Kuwait' },
+            { code: 'KG', name: 'Kyrgyzstan' },
+            { code: 'LA', name: 'Laos' },
+            { code: 'LV', name: 'Latvia' },
+            { code: 'LB', name: 'Lebanon' },
+            { code: 'LS', name: 'Lesotho' },
+            { code: 'LR', name: 'Liberia' },
+            { code: 'LY', name: 'Libya' },
+            { code: 'LI', name: 'Liechtenstein' },
+            { code: 'LT', name: 'Lithuania' },
+            { code: 'LU', name: 'Luxembourg' },
+            { code: 'MO', name: 'Macao' },
+            { code: 'MK', name: 'North Macedonia' },
+            { code: 'MG', name: 'Madagascar' },
+            { code: 'MW', name: 'Malawi' },
+            { code: 'MY', name: 'Malaysia' },
+            { code: 'MV', name: 'Maldives' },
+            { code: 'ML', name: 'Mali' },
+            { code: 'MT', name: 'Malta' },
+            { code: 'MH', name: 'Marshall Islands' },
+            { code: 'MQ', name: 'Martinique' },
+            { code: 'MR', name: 'Mauritania' },
+            { code: 'MU', name: 'Mauritius' },
+            { code: 'YT', name: 'Mayotte' },
+            { code: 'MX', name: 'Mexico' },
+            { code: 'FM', name: 'Micronesia' },
+            { code: 'MD', name: 'Moldova' },
+            { code: 'MC', name: 'Monaco' },
+            { code: 'MN', name: 'Mongolia' },
+            { code: 'ME', name: 'Montenegro' },
+            { code: 'MS', name: 'Montserrat' },
+            { code: 'MA', name: 'Morocco' },
+            { code: 'MZ', name: 'Mozambique' },
+            { code: 'MM', name: 'Myanmar' },
+            { code: 'NA', name: 'Namibia' },
+            { code: 'NR', name: 'Nauru' },
+            { code: 'NP', name: 'Nepal' },
+            { code: 'NL', name: 'Netherlands' },
+            { code: 'NC', name: 'New Caledonia' },
+            { code: 'NZ', name: 'New Zealand' },
+            { code: 'NI', name: 'Nicaragua' },
+            { code: 'NE', name: 'Niger' },
+            { code: 'NG', name: 'Nigeria' },
+            { code: 'NU', name: 'Niue' },
+            { code: 'NF', name: 'Norfolk Island' },
+            { code: 'MP', name: 'Northern Mariana Islands' },
+            { code: 'NO', name: 'Norway' },
+            { code: 'OM', name: 'Oman' },
+            { code: 'PK', name: 'Pakistan' },
+            { code: 'PW', name: 'Palau' },
+            { code: 'PS', name: 'Palestinian Territory' },
+            { code: 'PA', name: 'Panama' },
+            { code: 'PG', name: 'Papua New Guinea' },
+            { code: 'PY', name: 'Paraguay' },
+            { code: 'PE', name: 'Peru' },
+            { code: 'PH', name: 'Philippines' },
+            { code: 'PN', name: 'Pitcairn Islands' },
+            { code: 'PL', name: 'Poland' },
+            { code: 'PT', name: 'Portugal' },
+            { code: 'PR', name: 'Puerto Rico' },
+            { code: 'QA', name: 'Qatar' },
+            { code: 'RE', name: 'Reunion' },
+            { code: 'RO', name: 'Romania' },
+            { code: 'RU', name: 'Russia' },
+            { code: 'RW', name: 'Rwanda' },
+            { code: 'SH', name: 'Saint Helena' },
+            { code: 'KN', name: 'Saint Kitts and Nevis' },
+            { code: 'LC', name: 'Saint Lucia' },
+            { code: 'PM', name: 'Saint Pierre and Miquelon' },
+            { code: 'VC', name: 'Saint Vincent and the Grenadines' },
+            { code: 'WS', name: 'Samoa' },
+            { code: 'SM', name: 'San Marino' },
+            { code: 'ST', name: 'Sao Tome and Principe' },
+            { code: 'SA', name: 'Saudi Arabia' },
+            { code: 'SN', name: 'Senegal' },
+            { code: 'RS', name: 'Serbia' },
+            { code: 'SC', name: 'Seychelles' },
+            { code: 'SL', name: 'Sierra Leone' },
+            { code: 'SG', name: 'Singapore' },
+            { code: 'SX', name: 'Sint Maarten (Dutch part)' },
+            { code: 'SK', name: 'Slovakia' },
+            { code: 'SI', name: 'Slovenia' },
+            { code: 'SB', name: 'Solomon Islands' },
+            { code: 'SO', name: 'Somalia' },
+            { code: 'ZA', name: 'South Africa' },
+            { code: 'GS', name: 'South Georgia and the South Sandwich Islands' },
+            { code: 'SS', name: 'South Sudan' },
+            { code: 'ES', name: 'Spain' },
+            { code: 'LK', name: 'Sri Lanka' },
+            { code: 'SD', name: 'Sudan' },
+            { code: 'SR', name: 'Suriname' },
+            { code: 'SJ', name: 'Svalbard and Jan Mayen' },
+            { code: 'SZ', name: 'Swaziland' },
+            { code: 'SE', name: 'Sweden' },
+            { code: 'CH', name: 'Switzerland' },
+            { code: 'SY', name: 'Syria' },
+            { code: 'TW', name: 'Taiwan' },
+            { code: 'TJ', name: 'Tajikistan' },
+            { code: 'TZ', name: 'Tanzania' },
+            { code: 'TH', name: 'Thailand' },
+            { code: 'TL', name: 'Timor-Leste' },
+            { code: 'TG', name: 'Togo' },
+            { code: 'TK', name: 'Tokelau' },
+            { code: 'TO', name: 'Tonga' },
+            { code: 'TT', name: 'Trinidad and Tobago' },
+            { code: 'TN', name: 'Tunisia' },
+            { code: 'TR', name: 'Turkey' },
+            { code: 'TM', name: 'Turkmenistan' },
+            { code: 'TC', name: 'Turks and Caicos Islands' },
+            { code: 'TV', name: 'Tuvalu' },
+            { code: 'UG', name: 'Uganda' },
+            { code: 'UA', name: 'Ukraine' },
+            { code: 'AE', name: 'United Arab Emirates' },
+            { code: 'GB', name: 'United Kingdom' },
+            { code: 'US', name: 'United States' },
+            { code: 'UY', name: 'Uruguay' },
+            { code: 'UZ', name: 'Uzbekistan' },
+            { code: 'VU', name: 'Vanuatu' },
+            { code: 'VE', name: 'Venezuela' },
+            { code: 'VN', name: 'Vietnam' },
+            { code: 'VG', name: 'Virgin Islands (British)' },
+            { code: 'VI', name: 'Virgin Islands (U.S.)' },
+            { code: 'WF', name: 'Wallis and Futuna' },
+            { code: 'EH', name: 'Western Sahara' },
+            { code: 'YE', name: 'Yemen' },
+            { code: 'ZM', name: 'Zambia' },
+            { code: 'ZW', name: 'Zimbabwe' }
+        ];
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchWrapper = document.querySelector('.country-search-wrapper');
+            const searchInput = searchWrapper.querySelector('.country-search-input');
+            const dropdown = searchWrapper.querySelector('.country-dropdown');
+            const clearButton = searchWrapper.querySelector('.country-search-clear');
+            const hiddenInput = searchWrapper.querySelector('#selectedCountry');
+
+            // Initialize dropdown with all countries
+            function initializeDropdown() {
+                countries.forEach(country => {
+                    const option = document.createElement('div');
+                    option.className = 'country-option';
+                    option.dataset.value = country.code;
+                    option.textContent = country.name;
+                    dropdown.appendChild(option);
+                });
+            }
+
+            // Filter countries based on search input
+            function filterCountries(searchText) {
+                const options = dropdown.querySelectorAll('.country-option');
+                let hasResults = false;
+
+                options.forEach(option => {
+                    if (option.textContent.toLowerCase().includes(searchText.toLowerCase())) {
+                        option.style.display = 'block';
+                        hasResults = true;
+                    } else {
+                        option.style.display = 'none';
+                    }
+                });
+
+                return hasResults;
+            }
+
+            // Event Listeners
+            searchInput.addEventListener('focus', () => {
+                dropdown.classList.add('show');
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                const hasResults = filterCountries(e.target.value);
+                clearButton.classList.toggle('show', e.target.value.length > 0);
+                
+                if (!hasResults) {
+                    dropdown.innerHTML = '<div class="country-option">No results found</div>';
+                }
+            });
+
+            clearButton.addEventListener('click', () => {
+                searchInput.value = '';
+                hiddenInput.value = '';
+                clearButton.classList.remove('show');
+                filterCountries('');
+            });
+
+            dropdown.addEventListener('click', (e) => {
+                if (e.target.classList.contains('country-option')) {
+                    const selectedValue = e.target.dataset.value;
+                    const selectedText = e.target.textContent;
+                    
+                    if (selectedValue) {
+                        searchInput.value = selectedText;
+                        hiddenInput.value = selectedValue;
+                        dropdown.classList.remove('show');
+                        clearButton.classList.add('show');
+
+                        // Update selected state
+                        dropdown.querySelectorAll('.country-option').forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        e.target.classList.add('selected');
+                    }
+                }
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!searchWrapper.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+
+            // Initialize the dropdown with all countries
+            initializeDropdown();
+        });
+    </script>
+</body>
+</html>
