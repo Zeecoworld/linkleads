@@ -28,7 +28,7 @@ def get_linkedin_country_codes():
         'se': 'Sweden', 'ch': 'Switzerland', 'tw': 'Taiwan', 'tz': 'Tanzania', 
         'th': 'Thailand', 'tn': 'Tunisia', 'tr': 'Turkey', 'ug': 'Uganda', 
         'ua': 'Ukraine', 'ae': 'United Arab Emirates', 'uk': 'United Kingdom', 
-        'us': 'United States', 'uy': 'Uruguay', 'uz': 'Uzbekistan', 've': 'Venezuela', 
+        'www': 'United States', 'uy': 'Uruguay', 'uz': 'Uzbekistan', 've': 'Venezuela', 
         'vn': 'Vietnam', 'ye': 'Yemen', 'zm': 'Zambia', 'zw': 'Zimbabwe'
     }
 
